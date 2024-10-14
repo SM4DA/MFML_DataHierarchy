@@ -214,7 +214,7 @@ def varying_baselines(X_train:np.ndarray, X_val:np.ndarray,
     maedef = np.zeros((4),dtype=object)
     
     
-    for fb in range(1,2):#tqdm(range(4),desc='Baseline loop...'):
+    for fb in tqdm(range(4),desc='Baseline loop...'):
         maeols[fb],maedef[fb] = LC_routine(y_trains=y_train[fb:], indexes=indexes[fb:], 
                                            X_train=X_train, X_test=X_test, 
                                            X_val=X_val, y_test=y_test, y_val=y_val, k_type=ker,
@@ -236,7 +236,7 @@ def main():
     indexes = np.load('Data/indexes.npy',allow_pickle=True)
     
     #run single fidelity KRR for given molecule
-    '''
+    
     sf_maes,_ = SF_learning_curve(X_train=X_train, X_test=X_test, 
                                   y_train=y_train[-1], y_test=y_test, 
                                   k_type=ker,
@@ -244,23 +244,22 @@ def main():
                                   navg=navg) 
     
     np.save(f'outs/sf_mae_{prop}_{rep}.npy',sf_maes)
-    '''
-    n_list = [12,10,8,7,6,2,2,2,2]
     
-    for i in range(2,11): #loop over factors
-        if i>6:
-            varying_baselines(X_train, X_val, X_test, y_train, y_val, y_test, 
-                              indexes=indexes,
-                              ker=ker, sig=sig, reg=reg, 
-                              navg=navg, factor=i, nmax=n_list[i-2])
+    n_list = [12,10,8,7,6]
+    
+    for i in range(2,7): #loop over factors
+        varying_baselines(X_train, X_val, X_test, y_train, y_val, y_test, 
+                          indexes=indexes,
+                          ker=ker, sig=sig, reg=reg, 
+                          navg=navg, factor=i, nmax=n_list[i-2])
     
 
 if __name__=='__main__':
     prop='EV'
     rep='CM'
-    ker='matern' #matern usually; gaussian for SLATM SCF
+    ker='matern'
     reg=1e-10
-    sig=200.0 #200 for EV(CM) 2200 for SCF(CM) 650 for SCF(SLATM)
+    sig=200.0 
     navg=10
     
     main()
